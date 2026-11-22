@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>GWM 168 Dashboard v2.0</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<style>
+:root{--pr:#e61f18;--tx:#1d1d1f;--mu:#6e6e73;--bd:#e5e5ea;--bg:#f5f5f7;--ok:#1f8a4c;--wn:#b26a00;--ln:#0b6bcb}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:14px/1.5 "Noto Sans Thai",Sarabun,Tahoma,sans-serif}
+header{background:#fff;border-bottom:3px solid var(--pr);padding:8px 20px 0;position:sticky;top:0;z-index:5}
+.hr{display:flex;gap:12px;align-items:center;flex-wrap:wrap}header h1{margin:0;font-size:18px}header h1 small{font-weight:400;color:var(--mu);font-size:12px;margin-left:6px}.sp{flex:1}
+.btn{border:1px solid var(--bd);background:#fff;padding:6px 12px;border-radius:8px;cursor:pointer;font:inherit}.btn.p{background:var(--pr);color:#fff;border-color:var(--pr)}.btn:hover{filter:brightness(.97)}
+#tabs{display:flex;gap:2px;overflow-x:auto;margin-top:6px}#tabs button{border:0;background:none;padding:8px 14px;font:inherit;font-weight:600;color:var(--mu);cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-3px;white-space:nowrap}#tabs button.on{color:var(--pr);border-color:var(--pr)}
+.fb{background:#fff;border-bottom:1px solid var(--bd);padding:10px 20px;display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
+.fb label{display:flex;flex-direction:column;font-size:12px;color:var(--mu);gap:2px}.fb input,.fb select{font:inherit;font-size:13px;padding:5px 8px;border:1px solid var(--bd);border-radius:6px;min-width:110px;max-width:190px;color:var(--tx);background:#fff}
+.fb .ck{flex-direction:row;align-items:center;gap:6px;color:var(--tx);padding-bottom:6px}.fb .ck input{min-width:0}
+#chips{padding:8px 20px 0;display:flex;gap:6px;flex-wrap:wrap;align-items:center}.chip{background:#fff;border:1px solid var(--pr);color:var(--pr);border-radius:14px;padding:2px 10px;font-size:12px;cursor:pointer}.chip:hover{background:#fff4f3}
+main{padding:12px 20px 30px;max-width:1440px;margin:0 auto}
+.kp{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin-bottom:12px}
+.card{background:#fff;border:1px solid var(--bd);border-radius:12px;padding:14px 16px;margin-bottom:12px}.card h2{margin:0 0 10px;font-size:15px;display:flex;gap:8px;align-items:center}.card h2 .mu{font-weight:400;font-size:12px}
+.k{margin:0}.k .l{color:var(--mu);font-size:12px}.k .v{font-size:24px;font-weight:700;margin:2px 0;white-space:nowrap}.k .s{color:var(--mu);font-size:12px}.k.hi{border-left:5px solid var(--pr)}
+.dl{font-size:12px;font-weight:600}.dl.g{color:var(--ok)}.dl.b{color:var(--pr)}.dl.z{color:var(--mu)}
+.g2{display:grid;grid-template-columns:1.5fr 1fr;gap:12px}.g2e{display:grid;grid-template-columns:1fr 1fr;gap:12px}@media(max-width:1000px){.g2,.g2e{grid-template-columns:1fr}}
+.tw{overflow-x:auto}table{width:100%;border-collapse:collapse;font-size:13px}th{text-align:left;color:var(--mu);font-weight:600;border-bottom:1px solid var(--bd);padding:6px 8px;white-space:nowrap}td{padding:6px 8px;border-bottom:1px solid #f0f0f3;white-space:nowrap}
+th.so{cursor:pointer;user-select:none}th.so:hover{color:var(--tx)}td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
+tr.c{cursor:pointer}tr.c:hover td{background:#fafafa}tr.sel td{background:#fff4f3!important}tr.sel td:first-child{box-shadow:inset 4px 0 var(--pr)}
+.hot{color:#b3140f;font-weight:700}.cb{display:flex;gap:8px;align-items:center;justify-content:flex-end}.bar{height:7px;background:#f0f0f3;border-radius:4px;overflow:hidden;width:70px}.bar i{display:block;height:100%;background:var(--pr)}
+.mu{color:var(--mu)}.note{background:#fff8e6;border:1px solid #f1dca0;color:#6b4a00;border-radius:8px;padding:8px 12px;margin:0 0 10px;font-size:13px}
+.pill{display:inline-block;padding:1px 8px;border-radius:10px;font-size:11px;background:#eee;margin-left:4px;font-weight:600}.pill.r{background:#ffe3e1;color:#b3140f}.pill.o{background:#fff1d6;color:#8a5a00}
+.lg{display:flex;gap:14px;font-size:12px;color:var(--mu);margin-top:4px;flex-wrap:wrap}.lg i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px;vertical-align:-1px}
+.rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px;margin-bottom:12px}.rule{cursor:pointer}.rule.on{border-color:var(--pr);box-shadow:0 0 0 2px #ffd6d3}
+#login{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:20}#login form{background:#fff;border:1px solid var(--bd);border-top:4px solid var(--pr);border-radius:12px;padding:24px;width:320px;display:flex;flex-direction:column;gap:10px}
+#login input{font:inherit;padding:8px 10px;border:1px solid var(--bd);border-radius:8px}#msg{color:var(--pr);min-height:20px;font-size:13px}.hidden{display:none!important}
+.empty{padding:36px;text-align:center;color:var(--mu)}
+@media print{header .btn,.fb,#tabs,#chips .chip{display:none}header{position:static}.card{break-inside:avoid}}
+</style></head><body>
+<div id="login"><form onsubmit="event.preventDefault();doLogin()"><h2 style="margin:0">GWM 168 Dashboard</h2><div class="mu" style="margin-top:-6px">เข้าสู่ระบบด้วยบัญชีเดียวกับระบบจองรถ</div>
+<input id="lu" placeholder="Username" autocomplete="username"><input id="lp" type="password" placeholder="Password" autocomplete="current-password">
+<label style="display:flex;gap:6px;align-items:center;font-size:13px"><input id="lr" type="checkbox" style="padding:0"> จำการเข้าสู่ระบบ 30 วัน</label><div id="msg"></div><button class="btn p" id="lb">เข้าสู่ระบบ</button></form></div>
+<header><div class="hr"><h1>📊 GWM 168 Dashboard<small>v2.0 · อ่านอย่างเดียว</small></h1><div class="sp"></div>
+<span class="mu" id="sync"></span><button class="btn" onclick="load()">↻ รีเฟรช</button><button class="btn" onclick="exportX()">⬇ Export Excel</button><button class="btn" onclick="window.print()">🖨 Print / PDF</button><button class="btn" onclick="logout()">ออก</button></div>
+<div id="tabs"></div></header>
+<div class="fb" id="fb"></div><div id="chips"></div>
+<main id="app"><div class="empty">กำลังโหลดข้อมูล…</div></main>
+<script>
+/* =====================================================================
+   GWM Dashboard v2.0 — ต่อยอดจาก v1.0
+   • อ่านข้อมูลจาก Google Sheet ชุดเดียวกับระบบจองรถ (อ่านอย่างเดียว ไม่มี save / delete)
+   • Drill-down: Team → iAM → SKU → Model (รุ่นย่อย) → Booking / VIN
+   • ตัดข้อมูลส่วนบุคคลลูกค้า (ชื่อ เบอร์ เลขบัตร ที่อยู่ วันเกิด) ทิ้งตั้งแต่ตอนโหลด
+   ===================================================================== */
+const API_URL="https://script.google.com/macros/s/AKfycbye9w6AMsdh1jKAFBdmW98787QOmQ28iKTm_ydP1vSa5nohGVZCqnwFpvLX4nyXYfVFpg/exec";
+const SES_KEY="gwm_cloud_session",TABLE="BOOKINGS",CANCEL="ยกเลิก",DELIVERED="ส่งมอบแล้ว",INS_RE=/ประกัน|พ\.?\s*ร\.?\s*บ/;
+const TABS=[["exec","Executive"],["bd","Booking & Delivery"],["foc","FOC Performance"],["team","Team & iAM"],["sku","SKU & Model"],["camp","Campaign"],["exc","Exceptions"]];
+const DIMS=[["team","ทีม"],["iam","iAM"],["sku","SKU"],["variant","รุ่นย่อย"],["camp","แคมเปญ"],["pay","การชำระ"]];
+let RAW=[],SALES=[],ROWS=[],LEAD={},tab="exec",SORT={},excRule="",EXC_N=0;
+const F={preset:"month",from:"",to:"",team:"",iam:"",sku:"",variant:"",camp:"",pay:"",undeliv:false,nozero:false,
+ thr:+localStorage.getItem("gwmdash_thr")||20000,pthr:+localStorage.getItem("gwmdash_pthr")||1.5};
+const $=id=>document.getElementById(id),esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const fm=n=>Math.round(n||0).toLocaleString("en-US"),fb=n=>"฿"+fm(n),pc=n=>isFinite(n)?(n*100).toFixed(2)+"%":"–";
+const fmM=n=>Math.abs(n)>=1e6?(n/1e6).toFixed(2)+" ล้าน":fm(n);
+const ymd=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+const THM=["ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย.","ต.ค.","พ.ย.","ธ.ค."];
+const mLab=k=>{const[y,m]=k.split("-");return THM[+m-1]+" "+String(+y+543).slice(2)};
+const thd=v=>{const m=String(v||"").match(/^(\d{4})-(\d{2})-(\d{2})/);return m?`${+m[3]}/${+m[2]}/${String(+m[1]+543).slice(2)}`:"–"};
+const med=a=>{if(!a.length)return 0;const s=[...a].sort((x,y)=>x-y),h=s.length>>1;return s.length%2?s[h]:(s[h-1]+s[h])/2};
+const sum=(a,f)=>a.reduce((x,r)=>x+f(r),0),uniq=a=>[...new Set(a)].filter(x=>x!==""&&x!=null).sort((x,y)=>String(x).localeCompare(String(y),"th"));
+const uni=(...L)=>[...new Map(L.flat().map(r=>[r.no,r])).values()];
+/* ---------- API (อ่านอย่างเดียว) ---------- */
+function sesGet(){try{const s=JSON.parse(sessionStorage.getItem(SES_KEY)||localStorage.getItem(SES_KEY)||"null");if(s&&s.token&&s.exp>Date.now())return s}catch(e){}return null}
+async function api(action,payload={},auth=true){const body={action,...payload};if(auth){const s=sesGet();if(s)body.token=s.token}
+ const r=await fetch(API_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(body),redirect:"follow"});if(!r.ok)throw new Error("HTTP "+r.status);
+ const j=JSON.parse(await r.text());if(j.ok===false){const e=new Error(j.message||j.error||j.code||"Backend ปฏิเสธคำสั่ง");e.code=j.code||j.errorCode;throw e}return j}
+const rowsOf=j=>{const v=j&&(j.records||j.items||j.rows||j.data||j.result);return Array.isArray(v)?v:v&&Array.isArray(v.records)?v.records:v&&Array.isArray(v.items)?v.items:[]};
+async function listBookings(){let last;for(const a of["list","listRecords","getAll","read"]){try{return rowsOf(await api(a,{table:TABLE,entity:TABLE,sheet:TABLE,collection:TABLE}))}catch(e){last=e;if(e&&e.code&&e.code!="BAD_ACTION")throw e}}throw last}
+async function doLogin(){const m=$("msg");m.textContent="กำลังตรวจสอบ…";try{const j=await api("login",{username:$("lu").value.trim().toLowerCase(),password:$("lp").value},false);if(!j.token)throw new Error("ไม่ได้รับ token");
+ const d={...j,...(j.data||{})},s={token:d.token,user:d.user||{u:d.username||$("lu").value,name:d.name||d.username||"ผู้ใช้งาน",role:String(d.role||"user").toLowerCase()},exp:Date.now()+($("lr").checked?30*864e5:6*36e5)};
+ ($("lr").checked?localStorage:sessionStorage).setItem(SES_KEY,JSON.stringify(s));$("lp").value="";start()}catch(e){m.textContent=e.message}}
+function logout(){sessionStorage.removeItem(SES_KEY);localStorage.removeItem(SES_KEY);location.reload()}
+/* ---------- เตรียมข้อมูล ---------- */
+const num=v=>{const x=parseFloat(String(v??"").replace(/,/g,""));return isFinite(x)?x:0},dt=v=>/^\d{4}-\d{2}-\d{2}/.test(String(v||""))?String(v).slice(0,10):"";
+function norm(r){const price=num(r.price),disc=num(r.discount),items=(Array.isArray(r.foc)?r.foc:[]).map(x=>({n:String(x&&x.n||"").replace(/\s+/g," ").trim(),s:String(x&&x.s||"").trim().toUpperCase()})).filter(x=>x.n);
+ return{no:String(r.no||""),date:dt(r.date),dlv:dt(r.dlv),status:String(r.status||""),sku:String(r.model||"").trim()||"ไม่ระบุ SKU",variant:String(r.variant||"").trim()||"ไม่ระบุรุ่นย่อย",color:String(r.color||"").trim()||"–",
+  vin:String(r.vin||""),sales:String(r.sales||"").trim()||"ไม่ระบุ iAM",sid:r.salespersonId||"",team:String(r.salesTeam||"").trim(),camp:String(r.campaign||"").trim()||"ไม่ระบุแคมเปญ",
+  pay:r.pay=="เงินสด"?"เงินสด":r.pay?"ไฟแนนซ์":"ไม่ระบุ",net:num(r.netPrice)||Math.max(0,price-disc),foc:num(r.focCost),items}}
+function build(){const byId={},byName={};SALES.forEach(s=>{byId[s.id]=s;[s.displayName,[s.firstName,s.lastName].filter(Boolean).join(" "),s.firstName].filter(Boolean).forEach(n=>byName[String(n).trim()]=s)});
+ ROWS=RAW.map(norm).filter(r=>r.status!=CANCEL&&r.no);ROWS.forEach(r=>{const s=byId[r.sid]||byName[r.sales];if(s){if(!r.team)r.team=s.team||"";r.iam=s.displayName||r.sales}else r.iam=r.sales;r.team=r.team||"ไม่ระบุทีม"});
+ LEAD={};SALES.filter(s=>s.isLeader&&s.active!==false&&s.team).forEach(s=>LEAD[s.team]=s.displayName||[s.firstName,s.lastName].join(" "))}
+async function load(){$("app").innerHTML='<div class="empty">กำลังโหลดข้อมูล…</div>';try{
+ const[b,st]=await Promise.all([listBookings(),api("settingsGet",{}).catch(()=>({}))]);RAW=b;const m=(st&&st.settings)||{};
+ SALES=Object.keys(m).filter(k=>k.startsWith("sp:")&&m[k]).map(k=>({...(m[k].data||m[k]),id:(m[k].data||m[k]).id||k.slice(3)}));build();
+ $("sync").textContent="อัปเดต "+new Date().toLocaleTimeString("th-TH",{hour:"2-digit",minute:"2-digit"})+" · "+ROWS.length+" ใบจอง (ไม่รวมยกเลิก)";if(!F.from&&!F.to&&F.preset!="all")preset(F.preset,1);draw()}
+ catch(e){$("app").innerHTML=`<div class="empty">โหลดข้อมูลไม่สำเร็จ: ${esc(e.message)}<br><br><button class="btn p" onclick="load()">ลองอีกครั้ง</button> <button class="btn" onclick="logout()">เข้าสู่ระบบใหม่</button></div>`}}
+/* ---------- ตัวกรอง ---------- */
+function preset(p,quiet){F.preset=p;const n=new Date(),y=n.getFullYear(),m=n.getMonth();
+ if(p=="month"){F.from=ymd(new Date(y,m,1));F.to=ymd(new Date(y,m+1,0))}else if(p=="last"){F.from=ymd(new Date(y,m-1,1));F.to=ymd(new Date(y,m,0))}
+ else if(p=="q"){F.from=ymd(new Date(y,m-2,1));F.to=ymd(new Date(y,m+1,0))}else if(p=="year"){F.from=y+"-01-01";F.to=y+"-12-31"}else if(p=="all"){F.from="";F.to=""}
+ if(!quiet)draw()}
+function prevRange(){if(!F.from||!F.to)return null;const a=new Date(F.from+"T00:00"),b=new Date(F.to+"T00:00");
+ if(a.getDate()==1&&new Date(b.getFullYear(),b.getMonth()+1,0).getDate()==b.getDate()){const n=(b.getFullYear()-a.getFullYear())*12+b.getMonth()-a.getMonth()+1;return{from:ymd(new Date(a.getFullYear(),a.getMonth()-n,1)),to:ymd(new Date(a.getFullYear(),a.getMonth(),0)),lab:n+" เดือนก่อนหน้า"}}
+ const d=Math.round((b-a)/864e5)+1;return{from:ymd(new Date(a.getFullYear(),a.getMonth(),a.getDate()-d)),to:ymd(new Date(a.getFullYear(),a.getMonth(),a.getDate()-1)),lab:d+" วันก่อนหน้า"}}
+const dimOk=(r,ign=[])=>DIMS.every(([d])=>!F[d]||ign.includes(d)||r[d]==F[d]);
+function sets(fr,to,ign=[]){const inR=d=>!!d&&(!fr||d>=fr)&&(!to||d<=to);
+ const B=ROWS.filter(r=>dimOk(r,ign)&&inR(r.date)),D=ROWS.filter(r=>dimOk(r,ign)&&r.status==DELIVERED&&inR(r.dlv));
+ return{B,D,P:F.undeliv?uni(B,D):D,inR}}
+const cur=(ign)=>sets(F.from,F.to,ign);
+function stat(P){const V=F.nozero?P.filter(r=>r.foc>0):P,f=V.map(r=>r.foc),sv=sum(V,r=>r.net),fv=sum(V,r=>r.foc);
+ return{n:P.length,nv:V.length,zero:P.filter(r=>!r.foc).length,foc:sum(P,r=>r.foc),avg:f.length?fv/f.length:0,med:med(f),max:P.reduce((m,r)=>Math.max(m,r.foc),0),pct:sv?fv/sv:NaN}}
+function agg(keyFn,S){const{B,D,P}=S;return uniq([...B,...D,...P].map(keyFn)).map(k=>{const b=B.filter(r=>keyFn(r)==k),d=D.filter(r=>keyFn(r)==k),p=P.filter(r=>keyFn(r)==k),sales=sum(d,r=>r.net);
+ return{k,b:b.length,d:d.length,sales,asp:d.length?sales/d.length:0,...stat(p),rows:uni(b,d)}})}
+const mainOf=(L,key)=>{if(!L.length)return"–";const m={};L.forEach(r=>m[r[key]]=(m[r[key]]||0)+1);const[k,c]=Object.entries(m).sort((a,b)=>b[1]-a[1])[0];return`${esc(k)} <span class="mu">${Math.round(c/L.length*100)}%</span>`};
+/* ---------- Exceptions ---------- */
+const RULES=[["over","FOC เกินเกณฑ์/คัน",r=>r.foc>F.thr],["pct","FOC % ของราคาเกินเกณฑ์",r=>r.net>0&&r.foc/r.net*100>F.pthr],["zero","ส่งมอบแล้วแต่ FOC = 0",r=>r.status==DELIVERED&&!r.foc],
+ ["noCost","มีของแถมแต่ FOC = 0",r=>r.items.length>0&&!r.foc],["noItem","มี FOC แต่ไม่มีรายการของแถม",r=>r.foc>0&&!r.items.length]];
+function excOf(L){return L.map(r=>({...r,why:RULES.filter(x=>x[2](r)).map(x=>x[1])})).filter(r=>r.why.length)}
+/* ---------- ชิ้นส่วน UI ---------- */
+function dl(c,p,mode,badUp){if(p==null||!isFinite(p)||!isFinite(c))return"";if(c==p)return`<span class="dl z">= เท่าเดิม</span>`;const up=c>p,cls=(up==!badUp)?"g":"b",ar=up?"▲":"▼";
+ if(mode=="baht")return`<span class="dl ${cls}">${ar} ${fb(Math.abs(c-p))}</span>`;if(mode=="pp")return`<span class="dl ${cls}">${ar} ${(Math.abs(c-p)*100).toFixed(2)} pp</span>`;
+ return p?`<span class="dl ${cls}">${ar} ${(Math.abs(c-p)/p*100).toFixed(1)}%</span>`:`<span class="dl ${cls}">${ar} ใหม่</span>`}
+const kc=(l,v,s,hi,d)=>`<div class="card k ${hi?"hi":""}"><div class="l">${l}</div><div class="v">${v}</div><div class="s">${d?d+" · ":""}${s||"&nbsp;"}</div></div>`;
+function srt(id,c){const s=SORT[id];SORT[id]={c,d:s&&s.c==c?-s.d:-1};draw()}
+const COLS=[["b","จอง"],["d","ส่งมอบ"],["sales","มูลค่าขาย"],["asp","ASP"],["foc","FOC รวม"],["avg","FOC/คัน"],["med","Median"],["max","สูงสุด"],["pct","FOC %"]];
+function tbl(id,list,o={}){const s=SORT[id]||{c:o.sort||"d",d:-1};list=[...list].sort((a,b)=>{const x=a[s.c],y=b[s.c];return(typeof x=="string"?x.localeCompare(y,"th"):((isFinite(x)?x:0)-(isFinite(y)?y:0)))*s.d});
+ if(o.limit)list=list.slice(0,o.limit);const mx=Math.max(1,...list.map(x=>x.avg)),pre=(o.extra||[]).filter(e=>e.pre),post=(o.extra||[]).filter(e=>!e.pre);
+ const th=(c,l,n)=>`<th class="so ${n?"n":""}" onclick="srt('${id}','${c}')">${l}${s.c==c?(s.d<0?" ▼":" ▲"):""}</th>`;
+ return`<div class="tw"><table><tr>${th("k",o.label||"",0)}${pre.map(e=>`<th>${e.h}</th>`).join("")}${COLS.map(c=>th(c[0],c[1],1)).join("")}${post.map(e=>`<th>${e.h}</th>`).join("")}</tr>
+ ${list.map(x=>`<tr ${o.dim?`class="c${F[o.dim]==x.k?" sel":""}" data-k="${esc(x.k)}" onclick="drill('${o.dim}',this.dataset.k)" title="คลิกเพื่อเจาะลึก / คลิกซ้ำเพื่อยกเลิก"`:""}><td><b>${esc(x.k)}</b>${o.badge?o.badge(x):""}</td>${pre.map(e=>`<td>${e.f(x)}</td>`).join("")}
+ <td class="n">${fm(x.b)}</td><td class="n">${fm(x.d)}</td><td class="n">${fmM(x.sales)}</td><td class="n">${x.d?fb(x.asp):"–"}</td><td class="n">${fb(x.foc)}</td>
+ <td class="n ${x.avg>F.thr?"hot":""}"><div class="cb"><span>${x.nv?fb(x.avg):"–"}</span><div class="bar"><i style="width:${x.avg/mx*100}%"></i></div></div></td><td class="n">${x.nv?fb(x.med):"–"}</td><td class="n ${x.max>F.thr?"hot":""}">${fb(x.max)}</td><td class="n ${x.pct*100>F.pthr?"hot":""}">${pc(x.pct)}</td>
+ ${post.map(e=>`<td>${e.f(x)}</td>`).join("")}</tr>`).join("")||`<tr><td colspan="20" class="mu" style="text-align:center;padding:20px">ไม่มีข้อมูลในช่วงที่เลือก</td></tr>`}</table></div>`}
+function blist(L,lim=150){L=[...L].sort((a,b)=>(b.dlv||b.date).localeCompare(a.dlv||a.date));const w=L.some(r=>r.why);
+ return`<div class="tw"><table><tr><th>เลขใบจอง</th><th>วันจอง</th><th>ส่งมอบ</th><th>สถานะ</th><th>ทีม</th><th>iAM</th><th>SKU</th><th>รุ่นย่อย</th><th>สี</th><th>VIN</th><th>แคมเปญ</th><th class="n">ราคาสุทธิ</th><th class="n">FOC</th><th class="n">FOC %</th><th class="n">ของแถม</th>${w?"<th>เหตุผล</th>":""}</tr>
+ ${L.slice(0,lim).map(r=>`<tr><td><b>${esc(r.no)}</b></td><td>${thd(r.date)}</td><td>${thd(r.dlv)}</td><td>${esc(r.status)}</td><td>${esc(r.team)}</td><td>${esc(r.iam)}</td><td>${esc(r.sku)}</td><td>${esc(r.variant)}</td><td>${esc(r.color)}</td><td title="${esc(r.vin)}">${r.vin?"…"+esc(r.vin.slice(-8)):"–"}</td><td>${esc(r.camp)}</td>
+ <td class="n">${fb(r.net)}</td><td class="n ${r.foc>F.thr?"hot":""}">${fb(r.foc)}</td><td class="n ${r.net&&r.foc/r.net*100>F.pthr?"hot":""}">${pc(r.net?r.foc/r.net:NaN)}</td><td class="n" title="${esc(r.items.map(x=>x.n+(x.s?" ("+x.s+")":"")).join("\n"))}">${r.items.length}</td>${w?`<td>${r.why.map(x=>`<span class="pill r">${esc(x)}</span>`).join("")}</td>`:""}</tr>`).join("")||`<tr><td colspan="16" class="mu" style="text-align:center;padding:20px">ไม่มีรายการ</td></tr>`}</table></div>
+ ${L.length>lim?`<div class="mu" style="margin-top:6px">แสดง ${lim} จาก ${L.length} รายการ — กด Export Excel เพื่อดูทั้งหมด</div>`:""}`}
+function months(){let K=[];if(F.from&&F.to){let d=new Date(F.from.slice(0,7)+"-01T00:00");const e=F.to.slice(0,7);while(ymd(d).slice(0,7)<=e&&K.length<36){K.push(ymd(d).slice(0,7));d=new Date(d.getFullYear(),d.getMonth()+1,1)}}
+ else{const s=new Set();ROWS.forEach(r=>{if(r.date)s.add(r.date.slice(0,7));if(r.dlv)s.add(r.dlv.slice(0,7))});K=[...s].sort().slice(-12)}return K}
+function combo(S){const K=months();if(!K.length)return'<div class="empty">ไม่มีข้อมูล</div>';
+ const d=K.map(k=>{const dd=S.D.filter(r=>r.dlv.startsWith(k)),p=stat(S.P.filter(r=>(r.dlv||r.date).startsWith(k)));return{k,b:S.B.filter(r=>r.date.startsWith(k)).length,d:dd.length,v:sum(dd,r=>r.net),f:p.avg}});
+ const W=Math.max(560,K.length*70+80),H=240,T=24,BT=200,L=46,cw=(W-L-40)/K.length,mc=Math.max(1,...d.map(x=>Math.max(x.b,x.d))),mv=Math.max(1,...d.map(x=>x.v)),bw=Math.min(20,cw/3.2);
+ let s=`<svg viewBox="0 0 ${W} ${H}" width="100%" style="min-width:${Math.min(W,900)}px;font-family:inherit">`;
+ for(let i=0;i<=4;i++){const y=BT-(BT-T)*i/4;s+=`<line x1="${L}" x2="${W-40}" y1="${y}" y2="${y}" stroke="#eee"/><text x="${L-6}" y="${y+4}" font-size="10" fill="#999" text-anchor="end">${Math.round(mc*i/4)}</text><text x="${W-36}" y="${y+4}" font-size="10" fill="#0b6bcb">${(mv*i/4/1e6).toFixed(1)}M</text>`}
+ const pts=[];d.forEach((x,i)=>{const cx=L+cw*i+cw/2,hb=(BT-T)*x.b/mc,hd=(BT-T)*x.d/mc,ly=BT-(BT-T)*x.v/mv;pts.push(cx+","+ly);
+  s+=`<g><title>${mLab(x.k)}\nจอง ${x.b} คัน\nส่งมอบ ${x.d} คัน\nมูลค่าขาย ${fb(x.v)}\nFOC/คัน ${fb(x.f)}</title><rect x="${cx-cw/2}" y="${T}" width="${cw}" height="${BT-T}" fill="transparent"/>
+  <rect x="${cx-bw-1}" y="${BT-hb}" width="${bw}" height="${hb}" fill="#111" rx="2"/><rect x="${cx+1}" y="${BT-hd}" width="${bw}" height="${hd}" fill="#e61f18" rx="2"/>
+  <text x="${cx-bw/2-1}" y="${BT-hb-3}" font-size="10" text-anchor="middle" fill="#333">${x.b||""}</text><text x="${cx+bw/2+1}" y="${BT-hd-3}" font-size="10" text-anchor="middle" fill="#b3140f">${x.d||""}</text>
+  <text x="${cx}" y="${BT+16}" font-size="11" text-anchor="middle" fill="#666">${mLab(x.k)}</text></g>`});
+ s+=`<polyline points="${pts.join(" ")}" fill="none" stroke="#0b6bcb" stroke-width="2"/>`+pts.map(p=>{const[x,y]=p.split(",");return`<circle cx="${x}" cy="${y}" r="3" fill="#0b6bcb"/>`}).join("")+"</svg>";
+ return`<div class="tw">${s}</div><div class="lg"><span><i style="background:#111"></i>ยอดจอง (ตามวันจอง)</span><span><i style="background:#e61f18"></i>ส่งมอบ (ตามวันส่งมอบ)</span><span><i style="background:#0b6bcb"></i>มูลค่าขายส่งมอบ (แกนขวา, ล้านบาท)</span><span>· ชี้ที่เดือนเพื่อดูรายละเอียด</span></div>`}
+function dist(P){const t=F.thr,q=t/4,E=[q,2*q,3*q,t],L=["0 / ยังไม่กรอก","1 – "+fm(E[0]),fm(E[0]+1)+" – "+fm(E[1]),fm(E[1]+1)+" – "+fm(E[2]),fm(E[2]+1)+" – "+fm(E[3]),"> "+fm(t)],c=[0,0,0,0,0,0];
+ P.forEach(r=>{if(!r.foc)return c[0]++;const i=E.findIndex(e=>r.foc<=e);c[i<0?5:i+1]++});const mx=Math.max(1,...c);
+ return`<table>${L.map((l,i)=>`<tr><td style="width:150px">${l}</td><td><div class="bar" style="width:100%"><i style="width:${c[i]/mx*100}%;background:${i==0?"#bbb":i==5?"#b3140f":"var(--pr)"}"></i></div></td><td class="n" style="width:46px">${c[i]}</td><td class="n mu" style="width:50px">${P.length?Math.round(c[i]/P.length*100):0}%</td></tr>`).join("")}</table>`}
+function notes(S){const s=stat(S.P),nd=ROWS.filter(r=>dimOk(r)&&r.status==DELIVERED&&!r.dlv).length;
+ return(s.zero?`<div class="note">⚠️ ในฐานคำนวณ FOC มี <b>${s.zero} คัน</b> ที่ FOC = 0 หรือยังไม่ได้กรอก ${F.nozero?"(ตอนนี้ไม่นับในค่าเฉลี่ย)":"— ทำให้ค่าเฉลี่ยต่ำกว่าความจริง ติ๊ก “ไม่นับ FOC = 0” เพื่อดูเฉพาะคันที่กรอกแล้ว"}</div>`:"")+(nd?`<div class="note">ℹ️ มีรถสถานะ “ส่งมอบแล้ว” ที่ยังไม่มีวันส่งมอบ ${nd} คัน จึงไม่ถูกนับในยอดส่งมอบ</div>`:"")}
+function kpis(S){const pr=prevRange(),Q=pr&&sets(pr.from,pr.to),s=stat(S.P),q=Q&&stat(Q.P),sv=sum(S.D,r=>r.net),qv=Q&&sum(Q.D,r=>r.net);
+ return`<div class="kp">${kc("ยอดจอง",fm(S.B.length)+" คัน","ตามวันจอง",0,Q&&dl(S.B.length,Q.B.length))}${kc("ยอดส่งมอบ",fm(S.D.length)+" คัน","ตามวันส่งมอบ",0,Q&&dl(S.D.length,Q.D.length))}
+ ${kc("มูลค่าขายสุทธิ",fmM(sv),"ASP "+fb(S.D.length?sv/S.D.length:0),0,Q&&dl(sv,qv))}${kc("FOC รวม",fb(s.foc),s.n+" คันในฐานคำนวณ",0,Q&&dl(s.foc,q.foc,"pct",1))}
+ ${kc("FOC เฉลี่ย/คัน",fb(s.avg),"สูงสุด "+fb(s.max),1,Q&&dl(s.avg,q.avg,"baht",1))}${kc("FOC Median/คัน",fb(s.med),"ค่ากลาง ไม่ถูกคันผิดปกติดึง",1,Q&&dl(s.med,q.med,"baht",1))}
+ ${kc("FOC % ของยอดขาย",pc(s.pct),"เกณฑ์ "+F.pthr+"%",1,Q&&dl(s.pct,q.pct,"pp",1))}</div>${pr?`<div class="mu" style="margin:-6px 0 10px;font-size:12px">เทียบกับ ${pr.lab} (${thd(pr.from)} – ${thd(pr.to)}) · ▲▼ สีเขียว = ดีขึ้น, สีแดง = แย่ลง (FOC สูงขึ้นถือว่าแย่ลง)</div>`:""}`}
+const teamX=[{pre:1,h:"หัวหน้าทีม",f:x=>LEAD[x.k]?"👑 "+esc(LEAD[x.k]):'<span class="mu">–</span>'}],mixX=[{h:"SKU หลัก",f:x=>mainOf(x.rows,"sku")},{h:"แคมเปญหลัก",f:x=>mainOf(x.rows,"camp")}];
+/* ---------- หน้าจอ ---------- */
+function vExec(){const S=cur(),E=excOf(uni(S.B,S.D));
+ return notes(S)+kpis(S)+`<div class="g2"><div class="card"><h2>ยอดจอง · ส่งมอบ · มูลค่าขาย รายเดือน</h2>${combo(S)}</div><div class="card"><h2>การกระจาย FOC ต่อคัน <span class="mu">${S.P.length} คัน</span></h2>${dist(S.P)}
+ <div class="mu" style="margin-top:8px">เกินเกณฑ์ ${fb(F.thr)}/คัน: <b class="hot">${S.P.filter(r=>r.foc>F.thr).length} คัน</b> · <a href="#" onclick="setTab('exc');return false">ดูรายการตรวจสอบ ${E.length} รายการ →</a></div></div></div>
+ <div class="card"><h2>Team Performance <span class="mu">คลิกทีมเพื่อเจาะลึก</span></h2>${tbl("x_team",agg(r=>r.team,cur(["team","iam"])),{label:"ทีม",dim:"team",extra:[...teamX,...mixX]})}</div>
+ <div class="card"><h2>SKU Performance <span class="mu">คลิก SKU เพื่อดูรุ่นย่อย</span></h2>${tbl("x_sku",agg(r=>r.sku,cur(["sku","variant"])),{label:"SKU",dim:"sku"})}</div>`}
+function vBD(){const S=cur(),conv=S.B.length?S.B.filter(r=>r.status==DELIVERED).length/S.B.length:NaN,pend=S.B.filter(r=>r.status!=DELIVERED),allPend=ROWS.filter(r=>dimOk(r)&&r.status!=DELIVERED),
+ lt=S.D.filter(r=>r.date).map(r=>(new Date(r.dlv)-new Date(r.date))/864e5),sv=sum(S.D,r=>r.net);
+ const st={};S.B.forEach(r=>st[r.status]=(st[r.status]||0)+1);const stm=Math.max(1,...Object.values(st)),K=months();
+ return notes(S)+`<div class="kp">${kc("ยอดจอง",fm(S.B.length)+" คัน","ตามวันจอง")}${kc("ยอดส่งมอบ",fm(S.D.length)+" คัน","ตามวันส่งมอบ")}${kc("มูลค่าขายสุทธิ",fmM(sv),"ASP "+fb(S.D.length?sv/S.D.length:0))}
+ ${kc("Conversion ของใบจองช่วงนี้",pc(conv),"ใบจองในช่วงนี้ที่ส่งมอบแล้ว (ณ วันนี้)",1)}${kc("ใบจองช่วงนี้ที่ยังไม่ส่งมอบ",fm(pend.length)+" คัน","ค้างทั้งหมดทุกช่วง "+fm(allPend.length)+" คัน")}
+ ${kc("จองถึงส่งมอบ (เฉลี่ย)",lt.length?Math.round(lt.reduce((a,b)=>a+b,0)/lt.length)+" วัน":"–","มัธยฐาน "+(lt.length?Math.round(med(lt)):"–")+" วัน")}</div>
+ <div class="card"><h2>รายเดือน</h2>${combo(S)}</div>
+ <div class="g2"><div class="card"><h2>สรุปรายเดือน <span class="mu">Conversion = ใบจองของเดือนนั้นที่ส่งมอบแล้ว</span></h2><div class="tw"><table><tr><th>เดือน</th><th class="n">จอง</th><th class="n">ส่งมอบ</th><th class="n">Conversion (Cohort)</th><th class="n">มูลค่าขาย</th><th class="n">FOC/คัน</th></tr>
+ ${K.map(k=>{const b=S.B.filter(r=>r.date.startsWith(k)),d=S.D.filter(r=>r.dlv.startsWith(k)),c=b.filter(r=>r.status==DELIVERED).length;return`<tr><td>${mLab(k)}</td><td class="n">${b.length}</td><td class="n">${d.length}</td><td class="n">${b.length?Math.round(c/b.length*100)+"%":"–"}</td><td class="n">${fmM(sum(d,r=>r.net))}</td><td class="n">${d.length?fb(stat(d).avg):"–"}</td></tr>`}).join("")}</table></div></div>
+ <div class="card"><h2>สถานะของใบจองในช่วงนี้</h2><table>${Object.entries(st).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<tr><td style="width:120px">${esc(k)}</td><td><div class="bar" style="width:100%"><i style="width:${v/stm*100}%;background:${k==DELIVERED?"var(--ok)":"#111"}"></i></div></td><td class="n" style="width:46px">${v}</td></tr>`).join("")||'<tr><td class="mu">ไม่มีข้อมูล</td></tr>'}</table>
+ <h2 style="margin-top:16px">เงินสด / ไฟแนนซ์</h2>${tbl("bd_pay",agg(r=>r.pay,cur(["pay"])),{label:"การชำระ",dim:"pay"})}</div></div>
+ <div class="card"><h2>ใบจองในช่วงนี้ที่ยังไม่ส่งมอบ <span class="mu">${pend.length} คัน</span></h2>${blist(pend,100)}</div>`}
+function vFOC(){const S=cur(),s=stat(S.P),ins=S.P.filter(r=>r.items.some(x=>INS_RE.test(x.n))).length,it={};
+ S.P.forEach(r=>{const seen=new Set();r.items.forEach(x=>{const k=x.n;const o=it[k]||(it[k]={n:k,cars:0,GWM:0,PS:0,OT:0,ins:INS_RE.test(k)});if(!seen.has(k)){o.cars++;seen.add(k)}o[x.s=="GWM"?"GWM":x.s=="PS"?"PS":"OT"]++})});
+ const I=Object.values(it).sort((a,b)=>b.cars-a.cars);
+ return notes(S)+kpis(S)+`<div class="kp">${kc("คันที่ FOC เกินเกณฑ์",fm(S.P.filter(r=>r.foc>F.thr).length)+" คัน","เกณฑ์ > "+fb(F.thr)+"/คัน",1)}${kc("คันที่ FOC % เกินเกณฑ์",fm(S.P.filter(r=>r.net&&r.foc/r.net*100>F.pthr).length)+" คัน","เกณฑ์ > "+F.pthr+"% ของราคาขาย",1)}
+ ${kc("คันที่ FOC = 0",fm(s.zero)+" คัน","อาจยังไม่ได้กรอกต้นทุน")}${kc("แถมประกันภัย",pc(S.P.length?ins/S.P.length:NaN),ins+" จาก "+S.P.length+" คัน (ตรวจจากชื่อของแถม)")}</div>
+ <div class="g2"><div class="card"><h2>FOC ต่อคัน แยก SKU <span class="mu">คลิกเพื่อดูรุ่นย่อยในแท็บ SKU & Model</span></h2>${tbl("f_sku",agg(r=>r.sku,cur(["sku","variant"])),{label:"SKU",dim:"sku",sort:"avg"})}</div>
+ <div class="card"><h2>การกระจาย FOC ต่อคัน</h2>${dist(S.P)}</div></div>
+ <div class="card"><h2>รายการของแถมที่แจก <span class="mu">ต้นทุนรายชิ้นยังไม่ได้บันทึกในระบบ จึงแสดงเป็นจำนวน · GWM/PS = ผู้รับผิดชอบ</span></h2><div class="tw"><table><tr><th>ของแถม</th><th class="n">จำนวนคัน</th><th class="n">% ของรถ</th><th class="n">GWM</th><th class="n">PS</th><th class="n">ไม่ระบุ</th></tr>
+ ${I.map(x=>`<tr><td>${esc(x.n)}${x.ins?' <span class="pill o">ประกัน</span>':""}</td><td class="n">${x.cars}</td><td class="n">${S.P.length?Math.round(x.cars/S.P.length*100):0}%</td><td class="n">${x.GWM||""}</td><td class="n">${x.PS||""}</td><td class="n">${x.OT||""}</td></tr>`).join("")||'<tr><td colspan="6" class="mu">ไม่มีข้อมูล</td></tr>'}</table></div></div>`}
+function vTeam(){const S=cur(),ti=F.iam&&cur();
+ return`<div class="note">ℹ️ FOC ต่อคันขึ้นกับรุ่นรถ (SKU) และแคมเปญที่แต่ละทีม/iAM ได้รับ ตารางจึงแสดง SKU หลักและแคมเปญหลักควบคู่ — ใช้เพื่อวิเคราะห์ธุรกิจ ไม่ใช่คะแนนประเมินพนักงาน</div>
+ <div class="card"><h2>Team <span class="mu">คลิกทีมเพื่อกรอง iAM</span></h2>${tbl("t_team",agg(r=>r.team,cur(["team","iam"])),{label:"ทีม",dim:"team",extra:[...teamX,...mixX]})}</div>
+ <div class="card"><h2>iAM ${F.team?"· "+esc(F.team):"· ทุกทีม"} <span class="mu">คลิก iAM เพื่อเจาะลึก SKU / Model / Booking</span></h2>${tbl("t_iam",agg(r=>r.iam,cur(["iam"])),{label:"iAM",dim:"iam",badge:x=>Object.values(LEAD).includes(x.k)?' <span class="pill">หัวหน้าทีม</span>':"",extra:[{pre:1,h:"ทีม",f:x=>mainOf(x.rows,"team")},...mixX]})}</div>
+ ${F.iam?`<div class="card"><h2>🔎 ${esc(F.iam)} · แยก SKU</h2>${tbl("t_isku",agg(r=>r.sku,cur(["sku","variant"])),{label:"SKU",dim:"sku"})}</div><div class="card"><h2>🔎 ${esc(F.iam)} · แยกรุ่นย่อย</h2>${tbl("t_ivar",agg(r=>r.variant,cur(["variant"])),{label:"รุ่นย่อย (Model)",dim:"variant",extra:[{pre:1,h:"SKU",f:x=>mainOf(x.rows,"sku")}]})}</div>
+ <div class="card"><h2>🔎 ${esc(F.iam)} · รายการ Booking</h2>${blist(uni(ti.B,ti.D))}</div>`:""}`}
+function vSKU(){const S=cur();
+ return`<div class="card"><h2>SKU <span class="mu">คลิก SKU เพื่อดูรุ่นย่อย</span></h2>${tbl("s_sku",agg(r=>r.sku,cur(["sku","variant"])),{label:"SKU",dim:"sku"})}</div>
+ ${F.sku?`<div class="card"><h2>รุ่นย่อย (Model) ของ ${esc(F.sku)} <span class="mu">คลิกรุ่นย่อยเพื่อดูสีและรายการรถ</span></h2>${tbl("s_var",agg(r=>r.variant,cur(["variant"])),{label:"รุ่นย่อย (Model)",dim:"variant",extra:mixX.slice(1)})}</div>`
+ :`<div class="card"><h2>รุ่นย่อย (Model) ทั้งหมด</h2>${tbl("s_var",agg(r=>r.variant,cur(["variant"])),{label:"รุ่นย่อย (Model)",dim:"variant",extra:[{pre:1,h:"SKU",f:x=>mainOf(x.rows,"sku")}]})}</div>`}
+ ${F.variant?`<div class="card"><h2>สีของ ${esc(F.variant)}</h2>${tbl("s_col",agg(r=>r.color,S),{label:"สี"})}</div><div class="card"><h2>รายการ Booking / VIN</h2>${blist(uni(S.B,S.D))}</div>`:""}`}
+function vCamp(){const S=cur(["camp"]),C=agg(r=>r.camp,S),K=uniq(S.P.map(r=>r.sku));
+ return`<div class="note">ℹ️ “ไม่ระบุแคมเปญ” คือใบจองที่ยังไม่ได้กรอกแคมเปญ — แสดงไว้เพื่อตรวจความครบถ้วนของข้อมูล</div>
+ <div class="card"><h2>Campaign <span class="mu">คลิกแคมเปญเพื่อกรองทั้ง Dashboard</span></h2>${tbl("c_camp",C,{label:"แคมเปญ",dim:"camp",extra:[{h:"SKU หลัก",f:x=>mainOf(x.rows,"sku")}]})}</div>
+ <div class="card"><h2>FOC/คัน: แคมเปญ × SKU <span class="mu">ตัวเลขในวงเล็บ = จำนวนคัน</span></h2><div class="tw"><table><tr><th>แคมเปญ</th>${K.map(k=>`<th class="n">${esc(k)}</th>`).join("")}</tr>
+ ${C.map(c=>`<tr><td><b>${esc(c.k)}</b></td>${K.map(k=>{const p=S.P.filter(r=>r.camp==c.k&&r.sku==k),s=stat(p);return`<td class="n ${s.avg>F.thr?"hot":""}">${p.length?fb(s.avg)+` <span class="mu">(${p.length})</span>`:'<span class="mu">–</span>'}</td>`}).join("")}</tr>`).join("")}</table></div></div>`}
+function vExc(){const S=cur(),E=excOf(uni(S.B,S.D)),L=excRule?E.filter(r=>r.why.includes(RULES.find(x=>x[0]==excRule)[1])):E;
+ return`<div class="note">ℹ️ ตรวจจากใบจองและการส่งมอบในช่วงที่เลือก · ปรับเกณฑ์ได้ที่แถบตัวกรอง (FOC/คัน และ FOC %) · คลิกการ์ดเพื่อกรองตามกฎ</div>
+ <div class="rules">${RULES.map(([k,l])=>`<div class="card k rule ${excRule==k?"on":""}" onclick="excRule=excRule=='${k}'?'':'${k}';draw()"><div class="l">${l}</div><div class="v">${E.filter(r=>r.why.includes(l)).length}</div><div class="s">${k=="over"?"> "+fb(F.thr):k=="pct"?"> "+F.pthr+"%":"ตรวจคุณภาพข้อมูล"}</div></div>`).join("")}</div>
+ <div class="card"><h2>รายการที่ต้องตรวจสอบ <span class="mu">${L.length} คัน${excRule?" · กรองตามกฎที่เลือก":""}</span></h2>${blist(L,300)}</div>`}
+/* ---------- แถบตัวกรอง & เจาะลึก ---------- */
+function bar(){const opt=(k,L)=>`<option value="">ทั้งหมด</option>`+L.map(x=>`<option ${F[k]==x?"selected":""}>${esc(x)}</option>`).join("");
+ const R=ROWS,iamL=uniq(R.filter(r=>!F.team||r.team==F.team).map(r=>r.iam)),varL=uniq(R.filter(r=>!F.sku||r.sku==F.sku).map(r=>r.variant));
+ const sel=(k,l,L)=>`<label>${l}<select onchange="setDim('${k}',this.value)">${opt(k,L)}</select></label>`;
+ $("fb").innerHTML=`<label>ช่วงเวลา<select onchange="preset(this.value)">${[["month","เดือนนี้"],["last","เดือนที่แล้ว"],["q","3 เดือนล่าสุด"],["year","ปีนี้"],["all","ทั้งหมด"],["custom","กำหนดเอง"]].map(([v,l])=>`<option value="${v}" ${F.preset==v?"selected":""}>${l}</option>`).join("")}</select></label>
+ <label>ตั้งแต่<input type="date" value="${F.from}" onchange="F.from=this.value;F.preset='custom';draw()"></label><label>ถึง<input type="date" value="${F.to}" onchange="F.to=this.value;F.preset='custom';draw()"></label>
+ ${sel("team","ทีม",uniq(R.map(r=>r.team)))}${sel("iam","iAM",iamL)}${sel("sku","SKU",uniq(R.map(r=>r.sku)))}${sel("variant","รุ่นย่อย (Model)",varL)}${sel("camp","แคมเปญ",uniq(R.map(r=>r.camp)))}${sel("pay","การชำระ",uniq(R.map(r=>r.pay)))}
+ <label>เกณฑ์ FOC/คัน (บาท)<input type="number" min="0" step="1000" value="${F.thr}" style="min-width:90px;width:110px" onchange="F.thr=+this.value||20000;localStorage.setItem('gwmdash_thr',F.thr);draw()"></label>
+ <label>เกณฑ์ FOC % ขาย<input type="number" min="0" step="0.1" value="${F.pthr}" style="min-width:70px;width:80px" onchange="F.pthr=+this.value||1.5;localStorage.setItem('gwmdash_pthr',F.pthr);draw()"></label>
+ <label class="ck" title="ปกติ FOC คำนวณจากรถที่ส่งมอบแล้วเท่านั้น"><input type="checkbox" ${F.undeliv?"checked":""} onchange="F.undeliv=this.checked;draw()">FOC: รวมรถที่ยังไม่ส่งมอบ</label>
+ <label class="ck"><input type="checkbox" ${F.nozero?"checked":""} onchange="F.nozero=this.checked;draw()">ไม่นับ FOC = 0 ในค่าเฉลี่ย</label><button class="btn" style="margin-bottom:1px" onclick="resetF()">↺ ล้างตัวกรอง</button>`;
+ const on=DIMS.filter(([d])=>F[d]);$("chips").innerHTML=on.length?`<span class="mu" style="font-size:12px">กำลังเจาะลึก:</span>`+on.map(([d,l])=>`<span class="chip" onclick="setDim('${d}','')">${l}: ${esc(F[d])} ✕</span>`).join(""):""}
+function setDim(d,v){F[d]=v;if(d=="team"&&v&&F.iam&&!ROWS.some(r=>r.team==v&&r.iam==F.iam))F.iam="";if(d=="sku"&&F.variant&&!ROWS.some(r=>r.sku==v&&r.variant==F.variant))F.variant="";draw()}
+function drill(d,v){if(F[d]==v)return setDim(d,"");F[d]=v;if(d=="team")F.iam="";if(d=="sku")F.variant="";if(d=="variant"&&!F.sku){const r=ROWS.find(x=>x.variant==v);if(r)F.sku=r.sku}
+ if(tab=="exec"||tab=="foc")tab=d=="team"?"team":d=="sku"||d=="variant"?"sku":tab;draw()}
+function resetF(){DIMS.forEach(([d])=>F[d]="");excRule="";draw()}
+function setTab(t){tab=t;draw();scrollTo(0,0)}
+function draw(){const S=cur();EXC_N=excOf(uni(S.B,S.D)).length;$("tabs").innerHTML=TABS.map(([k,l])=>`<button class="${tab==k?"on":""}" onclick="setTab('${k}')">${l}${k=="exc"&&EXC_N?` <span class="pill r">${EXC_N}</span>`:""}</button>`).join("");
+ bar();$("app").innerHTML={exec:vExec,bd:vBD,foc:vFOC,team:vTeam,sku:vSKU,camp:vCamp,exc:vExc}[tab]()}
+/* ---------- Export Excel (ไม่มีข้อมูลส่วนบุคคลลูกค้า) ---------- */
+function exportX(){const S=cur(),U=uni(S.B,S.D),r2=n=>Math.round(n*100)/100;
+ const bk=U.map(r=>({"เลขใบจอง":r.no,"วันจอง":r.date,"วันส่งมอบ":r.dlv,"สถานะ":r.status,"ทีม":r.team,"iAM":r.iam,"SKU":r.sku,"รุ่นย่อย (Model)":r.variant,"สี":r.color,"VIN":r.vin,"แคมเปญ":r.camp,"การชำระ":r.pay,"ราคาสุทธิ":r.net,"FOC":r.foc,"FOC %":r.net?r2(r.foc/r.net*100):"","จำนวนของแถม":r.items.length,"ของแถม":r.items.map(x=>x.n+(x.s?" ("+x.s+")":"")).join(" | ")}));
+ const ag=(L,lab)=>L.map(x=>({[lab]:x.k,"จอง":x.b,"ส่งมอบ":x.d,"มูลค่าขาย":x.sales,"ASP":Math.round(x.asp),"FOC รวม":x.foc,"FOC/คัน":Math.round(x.avg),"Median":Math.round(x.med),"สูงสุด":x.max,"FOC %":isFinite(x.pct)?r2(x.pct*100):""}));
+ const fi=[["ช่วงวันที่",(F.from||"ทั้งหมด")+" ถึง "+(F.to||"ทั้งหมด")],...DIMS.map(([d,l])=>[l,F[d]||"ทั้งหมด"]),["FOC รวมรถที่ยังไม่ส่งมอบ",F.undeliv?"ใช่":"ไม่"],["ไม่นับ FOC = 0 ในค่าเฉลี่ย",F.nozero?"ใช่":"ไม่"],["เกณฑ์ FOC/คัน",F.thr],["เกณฑ์ FOC %",F.pthr],["ส่งออกเมื่อ",new Date().toLocaleString("th-TH")]].map(([a,b])=>({"ตัวกรอง":a,"ค่า":b}));
+ const name="GWM_Dashboard_"+(F.from||"all")+"_"+(F.to||"all");
+ if(!window.XLSX){const h=Object.keys(bk[0]||{"เลขใบจอง":""}),csv="\ufeff"+[h.join(","),...bk.map(o=>h.map(k=>'"'+String(o[k]??"").replace(/"/g,'""')+'"').join(","))].join("\n");
+  const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));a.download=name+".csv";a.click();return alert("โหลดไลบรารี Excel ไม่ได้ จึงส่งออกเป็น CSV (เฉพาะรายการ Booking)")}
+ const wb=XLSX.utils.book_new(),add=(n,a)=>XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(a.length?a:[{"":"ไม่มีข้อมูล"}]),n);
+ add("ตัวกรอง",fi);add("Bookings",bk);add("Team",ag(agg(r=>r.team,cur(["team","iam"])),"ทีม"));add("iAM",ag(agg(r=>r.iam,cur(["iam"])),"iAM"));add("SKU",ag(agg(r=>r.sku,cur(["sku","variant"])),"SKU"));
+ add("Model",ag(agg(r=>r.variant,cur(["variant"])),"รุ่นย่อย (Model)"));add("Campaign",ag(agg(r=>r.camp,cur(["camp"])),"แคมเปญ"));
+ add("FOC_Items",S.P.flatMap(r=>r.items.map(x=>({"เลขใบจอง":r.no,"SKU":r.sku,"รุ่นย่อย (Model)":r.variant,"ทีม":r.team,"iAM":r.iam,"แคมเปญ":r.camp,"ของแถม":x.n,"ผู้รับผิดชอบ":x.s,"เป็นประกัน":INS_RE.test(x.n)?"ใช่":""}))));
+ add("Exceptions",excOf(U).map(r=>({"เลขใบจอง":r.no,"สถานะ":r.status,"ทีม":r.team,"iAM":r.iam,"SKU":r.sku,"รุ่นย่อย (Model)":r.variant,"แคมเปญ":r.camp,"ราคาสุทธิ":r.net,"FOC":r.foc,"เหตุผล":r.why.join(" | ")})));
+ XLSX.writeFile(wb,name+".xlsx")}
+function start(){const s=sesGet();if(!s){$("login").classList.remove("hidden");return}$("login").classList.add("hidden");load()}
+start();
+</script></body></html>
